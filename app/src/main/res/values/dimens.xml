@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="x_8">8dp</dimen>
+    <dimen name="x_4">4dp</dimen>
+    <dimen name="s_16">16sp</dimen>
+    <dimen name="s_13">13sp</dimen>
+</resources>
