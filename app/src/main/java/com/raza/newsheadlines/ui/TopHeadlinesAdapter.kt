@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.raza.newsheadlines.R
 import com.raza.newsheadlines.source.model.NewsResponse
 import com.raza.newsheadlines.utils.DiffUtilCallBack
 
-class TopHeadlinesAdapter(val callback: (NewsResponse.Article) -> Unit) : PagedListAdapter<NewsResponse.Article, TopHeadlinesAdapter.HeadlinesItemViewHolder>(DiffUtilCallBack()) {
+class TopHeadlinesAdapter(val callback: (NewsResponse.Article) -> Unit) : PagingDataAdapter<NewsResponse.Article, TopHeadlinesAdapter.HeadlinesItemViewHolder>(DiffUtilCallBack()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.headlines_item, parent, false)
         return HeadlinesItemViewHolder(view)

@@ -38,7 +38,7 @@ android {
 dependencies {
 
     // Paging library
-    implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
+    implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
     // ViewModel and lifecycle
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     // Retrofit

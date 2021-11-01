@@ -1,71 +1,60 @@
 package com.raza.newsheadlines.source
 
 import android.util.Log
-import androidx.paging.PageKeyedDataSource
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.raza.newsheadlines.source.model.NewsResponse
 import com.raza.newsheadlines.source.network.Api
 import com.raza.newsheadlines.source.network.RetrofitClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
-class NewsListDataSource(coroutineContext: CoroutineContext) :
-    PageKeyedDataSource<Int, NewsResponse.Article>() {
+class NewsListDataSource : PagingSource<Int, NewsResponse.Article>() {
     private val apiService = RetrofitClient.getClient().create(Api::class.java)
 
-    private val job = Job()
-    private val scope = CoroutineScope(coroutineContext + job)
 
-    override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, NewsResponse.Article>) {
-        scope.launch {
-            try {
-                val response = apiService.getHeadlines(pageSize = params.requestedLoadSize)
-                when{
-                    response.isSuccessful -> {
-                        val articles = response.body()?.articles
-                        callback.onResult(articles ?: listOf(), null, 1)
+   /* override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NewsResponse.Article> {
+        try {
+            val response =
+                apiService.getHeadlines(page = params.key)
+            when{
+                response.isSuccessful -> {
+                    val articles = response.body()?.articles
+                    val next = params.key?.let { it  + 1 }
+                    val previousKey = params.key
+                    articles?.let {
+                        return LoadResult.Page(articles, previousKey, next)
                     }
                 }
-            }catch (exception : Exception){
-                Log.e("NewsListDataSource", exception.toString())
             }
 
+        }catch (exception : Exception){
+            Log.e("NewsListDataSource", "Failed to fetch data!")
         }
+    }*/
 
+    override fun getRefreshKey(state: PagingState<Int, NewsResponse.Article>): Int? {
+        TODO("Not yet implemented")
     }
 
-    override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, NewsResponse.Article>) {
-        scope.launch {
-            try {
-                val response =
-                    apiService.getHeadlines(pageSize = params.requestedLoadSize, page = params.key)
-                when{
-                    response.isSuccessful -> {
-                        val articles = response.body()?.articles
-                        var next = params.key
-                        next+=1
-                        callback.onResult(articles ?: listOf(), next)
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NewsResponse.Article> {
+        try {
+            val response =
+                apiService.getHeadlines(page = params.key)
+            params
+            when{
+                response.isSuccessful -> {
+                    val articles = response.body()?.articles
+                    val next = params.key?.let { it  + 1 }
+                    val previousKey = params.key
+                    articles?.let {
+                        return LoadResult.Page(articles, previousKey, next)
                     }
                 }
-
-            }catch (exception : Exception){
-                Log.e("NewsListDataSource", "Failed to fetch data!")
             }
+
+        }catch (exception : Exception){
+            Log.e("NewsListDataSource", "Failed to fetch data!")
         }
-
-    }
-
-    override fun invalidate() {
-        super.invalidate()
-        job.cancel()
-    }
-
-    override fun loadBefore(
-        params: LoadParams<Int>,
-        callback: LoadCallback<Int, NewsResponse.Article>
-    ) {
-
+        return LoadResult.Page(listOf(), 0, 1)
     }
 
 }
